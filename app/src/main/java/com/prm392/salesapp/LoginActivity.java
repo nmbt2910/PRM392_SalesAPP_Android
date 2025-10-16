@@ -1,0 +1,71 @@
+package com.prm392.salesapp;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.prm392.salesapp.viewmodel.LoginViewModel;
+
+public class LoginActivity extends AppCompatActivity {
+
+    private TextInputEditText usernameInput;
+    private TextInputEditText passwordInput;
+    private LoginViewModel loginViewModel;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        usernameInput = findViewById(R.id.username_input);
+        passwordInput = findViewById(R.id.password_input);
+        Button loginButton = findViewById(R.id.login_button);
+        TextView signupLink = findViewById(R.id.signup_link);
+
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+
+        loginViewModel.getLoginResponse().observe(this, loginResponse -> {
+            Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+
+            // Save the auth token
+            SharedPreferences sharedPreferences = getSharedPreferences("SalesAppPrefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("AUTH_TOKEN", loginResponse.getToken());
+            editor.apply();
+
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
+        loginViewModel.getLoginError().observe(this, error -> {
+            Toast.makeText(LoginActivity.this, "Login failed: " + error, Toast.LENGTH_SHORT).show();
+        });
+
+        loginButton.setOnClickListener(v -> loginUser());
+
+        signupLink.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void loginUser() {
+        String username = usernameInput.getText().toString().trim();
+        String password = passwordInput.getText().toString().trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        loginViewModel.login(username, password);
+    }
+}

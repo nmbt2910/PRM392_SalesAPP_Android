@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base background color -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F0F2F5" />
+        </shape>
+    </item>
+
+    <!-- Subtle gradient overlay -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="90"
+                android:startColor="#E3F2FD"
+                android:endColor="#F0F2F5"
+                android:type="linear" />
+        </shape>
+    </item>
+
+    <!-- Decorative "drawing" - a soft circle/blob -->
+    <item
+        android:left="-200dp"
+        android:top="-250dp"
+        android:right="150dp"
+        android:bottom="400dp">
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#A8C5E2"
+                android:endColor="#D4E3F3"
+                android:type="radial"
+                android:gradientRadius="300dp"/>
+        </shape>
+    </item>
+
+    <!-- Another decorative "drawing" -->
+    <item
+        android:left="150dp"
+        android:top="500dp"
+        android:right="-250dp"
+        android:bottom="-200dp">
+        <shape android:shape="oval">
+             <gradient
+                android:startColor="#B2CCDF"
+                android:endColor="#E1EBF5"
+                android:type="radial"
+                android:gradientRadius="350dp"/>
+        </shape>
+    </item>
+</layer-list>
