@@ -27,7 +27,7 @@ You've completed several core functionalities of the app. Here's a breakdown of 
 ### How to Run the Project 🚀
 
 1.  Clone the repository:
-    `git clone <repository_url>`
+    `git clone https://github.com/nmbt2910/PRM392_SalesAPP_Android.git`
 2.  Open the project in Android Studio.
 3.  Ensure you have a backend server running with the required REST APIs to handle data requests.
 4.  Build and run the app on an Android emulator or a physical device.
