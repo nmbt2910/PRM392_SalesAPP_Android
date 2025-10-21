@@ -71,7 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:textColor="@color/colorPrice"
+                    android:textColor="@color/colorPrimary"
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
@@ -80,7 +80,7 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="24dp"
-                    android:background="@color/colorDivider" />
+                    android:background="@color/colorBorder" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -104,7 +104,7 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="24dp"
-                    android:background="@color/colorDivider" />
+                    android:background="@color/colorBorder" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -131,7 +131,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:cardBackgroundColor="@color/colorCardBackground"
         app:cardElevation="8dp"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.App.RoundedImage">
 
@@ -145,7 +144,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.App.TextInputLayout"
                 android:minWidth="80dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -160,6 +159,7 @@
 
             <Button
                 android:id="@+id/add_to_cart_button"
+                style="@style/Widget.App.Button"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="16dp"

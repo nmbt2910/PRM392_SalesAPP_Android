@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
+import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Locale;
 
 public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.ProductViewHolder> {
 
@@ -22,6 +22,11 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 
     public ProductListAdapter(List<Product> productList) {
         this.productList = productList;
+    }
+
+    public void updateProducts(List<Product> newProductList) {
+        this.productList = newProductList;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -35,8 +40,10 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = productList.get(position);
         holder.productName.setText(product.getProductName());
-        holder.productDescription.setText(product.getBriefDescription());
-        holder.productPrice.setText(String.format(Locale.US, "$%.2f", product.getPrice()));
+
+        // Use DecimalFormat for a cleaner price display
+        DecimalFormat formatter = new DecimalFormat("$#,##0.##");
+        holder.productPrice.setText(formatter.format(product.getPrice()));
 
         String imageUrl = product.getImageURL();
 
@@ -62,14 +69,12 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
     static class ProductViewHolder extends RecyclerView.ViewHolder {
         ImageView productImage;
         TextView productName;
-        TextView productDescription;
         TextView productPrice;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
             productImage = itemView.findViewById(R.id.product_image);
             productName = itemView.findViewById(R.id.product_name);
-            productDescription = itemView.findViewById(R.id.product_description);
             productPrice = itemView.findViewById(R.id.product_price);
         }
     }

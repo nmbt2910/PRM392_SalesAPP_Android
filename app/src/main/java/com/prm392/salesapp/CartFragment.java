@@ -20,13 +20,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.prm392.salesapp.api.CartApiService;
 import com.prm392.salesapp.network.RetrofitClient;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,7 +39,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
     private LinearLayout errorLayout;
     private Button reloadButton;
     private TextView totalPriceTextView;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private Button checkoutButton;
 
     @Nullable
     @Override
@@ -52,13 +51,15 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
         errorLayout = view.findViewById(R.id.error_layout_cart);
         reloadButton = view.findViewById(R.id.reload_button_cart);
         totalPriceTextView = view.findViewById(R.id.total_price_text_view);
-        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout_cart);
+        checkoutButton = view.findViewById(R.id.checkout_button);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         reloadButton.setOnClickListener(v -> fetchCart());
 
-        swipeRefreshLayout.setOnRefreshListener(this::fetchCart);
+        checkoutButton.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Checkout not implemented yet.", Toast.LENGTH_SHORT).show();
+        });
 
         return view;
     }
@@ -79,7 +80,6 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
         if (authToken == null) {
             progressBar.setVisibility(View.GONE);
             errorLayout.setVisibility(View.VISIBLE);
-            swipeRefreshLayout.setRefreshing(false);
             return;
         }
 
@@ -88,13 +88,15 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
             @Override
             public void onResponse(Call<Cart> call, Response<Cart> response) {
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     errorLayout.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
                     adapter = new CartAdapter(response.body().getItems(), CartFragment.this);
                     recyclerView.setAdapter(adapter);
-                    totalPriceTextView.setText(String.format(Locale.US, "$%.2f", response.body().getTotalPrice()));
+
+                    DecimalFormat formatter = new DecimalFormat("$#,##0.##");
+                    totalPriceTextView.setText(formatter.format(response.body().getTotalPrice()));
+
                 } else {
                     errorLayout.setVisibility(View.VISIBLE);
                 }
@@ -103,7 +105,6 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
             @Override
             public void onFailure(Call<Cart> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
                 errorLayout.setVisibility(View.VISIBLE);
             }
         });

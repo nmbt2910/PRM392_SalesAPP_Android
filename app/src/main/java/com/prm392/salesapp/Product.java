@@ -53,11 +53,15 @@ public class Product {
         return technicalSpecifications;
     }
 
-    public double getPrice() {
-        return price;
+    public float getPrice() {
+        return (float) price;
     }
 
     public String getImageURL() {
         return imageURL;
+    }
+
+    public String getCategory() {
+        return categoryName;
     }
 }

@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Locale;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
@@ -43,8 +43,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItemDetail cartItem = cartItems.get(position);
         holder.productName.setText(cartItem.getProductName());
-        holder.productPrice.setText(String.format(Locale.US, "$%.2f", cartItem.getPrice()));
         holder.quantity.setText(String.valueOf(cartItem.getQuantity()));
+
+        // Use DecimalFormat for a cleaner price display
+        DecimalFormat formatter = new DecimalFormat("$#,##0.##");
+        holder.productPrice.setText(formatter.format(cartItem.getPrice()));
 
         Glide.with(holder.itemView.getContext())
                 .load(cartItem.getImageURL())
