@@ -23,9 +23,14 @@
         </activity>
 
         <activity android:name=".LoginActivity" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".SignupActivity" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".SignupActivity" android-windowSoftInputMode="adjustResize" />
         <activity android:name=".ProductDetailActivity" />
         <activity android:name=".EditProfileActivity" />
+        <activity android:name=".chat.ChatActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity" />
+        </activity>
 
     </application>
 

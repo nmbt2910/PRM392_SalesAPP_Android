@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,13 +15,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
+public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> implements Filterable {
 
     private List<CartItemDetail> cartItems;
+    private List<CartItemDetail> cartItemsFull;
     private CartItemListener listener;
+    private FilterListener filterListener;
 
     public interface CartItemListener {
         void onIncreaseQuantity(int cartItemId, int currentQuantity);
@@ -27,9 +33,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         void onRemoveItem(int cartItemId);
     }
 
-    public CartAdapter(List<CartItemDetail> cartItems, CartItemListener listener) {
+    public interface FilterListener {
+        void onFilterComplete(int count);
+    }
+
+    public CartAdapter(List<CartItemDetail> cartItems, CartItemListener listener, FilterListener filterListener) {
         this.cartItems = cartItems;
+        this.cartItemsFull = new ArrayList<>(cartItems);
         this.listener = listener;
+        this.filterListener = filterListener;
     }
 
     @NonNull
@@ -45,9 +57,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.productName.setText(cartItem.getProductName());
         holder.quantity.setText(String.valueOf(cartItem.getQuantity()));
 
-        // Use DecimalFormat for a cleaner price display
-        DecimalFormat formatter = new DecimalFormat("$#,##0.##");
-        holder.productPrice.setText(formatter.format(cartItem.getPrice()));
+        // Use NumberFormat for currency display
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        holder.productPrice.setText(currencyFormatter.format(cartItem.getPrice()));
 
         Glide.with(holder.itemView.getContext())
                 .load(cartItem.getImageURL())
@@ -68,6 +80,41 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public int getItemCount() {
         return cartItems.size();
     }
+
+    @Override
+    public Filter getFilter() {
+        return cartFilter;
+    }
+
+    private Filter cartFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<CartItemDetail> filteredList = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(cartItemsFull);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+                for (CartItemDetail item : cartItemsFull) {
+                    if (item.getProductName().toLowerCase().contains(filterPattern)) {
+                        filteredList.add(item);
+                    }
+                }
+            }
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            cartItems.clear();
+            cartItems.addAll((List) results.values);
+            if (filterListener != null) {
+                filterListener.onFilterComplete(cartItems.size());
+            }
+            notifyDataSetChanged();
+        }
+    };
 
     static class CartViewHolder extends RecyclerView.ViewHolder {
         ImageView productImage;

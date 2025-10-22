@@ -13,6 +13,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.prm392.salesapp.viewmodel.ProductViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
 
     private ProductViewModel productViewModel;
@@ -41,7 +44,10 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
 
         // Observe and Setup Category Spinner
         productViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
-            ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, categories);
+            List<String> allCategories = new ArrayList<>();
+            allCategories.add("All");
+            allCategories.addAll(categories);
+            ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, allCategories);
             categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             categorySpinner.setAdapter(categoryAdapter);
         });
@@ -56,6 +62,8 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
 
         clearButton.setOnClickListener(v -> {
             productViewModel.clearFilters();
+            sortSpinner.setSelection(0);
+            categorySpinner.setSelection(0);
             dismiss();
         });
 

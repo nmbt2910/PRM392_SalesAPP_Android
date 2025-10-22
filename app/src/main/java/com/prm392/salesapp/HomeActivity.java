@@ -6,11 +6,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.work.OneTimeWorkRequest;
@@ -21,13 +19,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-        if (isGranted) {
-            Toast.makeText(this, "Notifications enabled", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Notifications disabled", Toast.LENGTH_SHORT).show();
-        }
-    });
+    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +39,14 @@ public class HomeActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_home);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        NOTIFICATION_PERMISSION_REQUEST_CODE);
+            }
+        }
+
         ViewPager2 viewPager = findViewById(R.id.view_pager);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
 
@@ -64,13 +64,15 @@ public class HomeActivity extends AppCompatActivity {
                     tab.setIcon(R.drawable.ic_shopping_cart);
                     break;
                 case 2:
+                    tab.setText("Chat");
+                    tab.setIcon(R.drawable.ic_chat);
+                    break;
+                case 3:
                     tab.setText("Profile");
                     tab.setIcon(R.drawable.ic_person);
                     break;
             }
         }).attach();
-
-        askNotificationPermission();
     }
 
     @Override
@@ -79,14 +81,5 @@ public class HomeActivity extends AppCompatActivity {
         // Schedule a one-time notification check when the app is closed or backgrounded
         OneTimeWorkRequest cartWorkRequest = new OneTimeWorkRequest.Builder(CartNotificationWorker.class).build();
         WorkManager.getInstance(this).enqueue(cartWorkRequest);
-    }
-
-    private void askNotificationPermission() {
-        // This is only necessary for API level 33+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            }
-        }
     }
 }

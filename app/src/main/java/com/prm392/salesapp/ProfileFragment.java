@@ -16,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import com.google.android.material.textview.MaterialTextView;
@@ -37,7 +36,6 @@ public class ProfileFragment extends Fragment {
         usernameTextView = view.findViewById(R.id.username_textview);
         emailTextView = view.findViewById(R.id.email_textview);
         Button logoutButton = view.findViewById(R.id.logout_button);
-        MaterialTextView testNotificationButton = view.findViewById(R.id.test_notification_button);
         MaterialTextView editProfileButton = view.findViewById(R.id.edit_profile_button);
 
         // Initialize ViewModel
@@ -48,10 +46,6 @@ public class ProfileFragment extends Fragment {
         editProfileButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), EditProfileActivity.class);
             startActivity(intent);
-        });
-        testNotificationButton.setOnClickListener(v -> {
-            OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(CartNotificationWorker.class).build();
-            WorkManager.getInstance(getContext()).enqueue(oneTimeWorkRequest);
         });
 
         // Observe ViewModel LiveData

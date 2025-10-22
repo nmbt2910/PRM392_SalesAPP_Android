@@ -47,7 +47,6 @@ public class ProductViewModel extends ViewModel {
                     productList.setValue(originalProductList);
 
                     Set<String> categorySet = new HashSet<>();
-                    categorySet.add("All Categories");
                     for (Product product : originalProductList) {
                         categorySet.add(product.getCategory());
                     }
@@ -66,11 +65,14 @@ public class ProductViewModel extends ViewModel {
     }
 
     public void applyFiltersAndSort(String category, int sortOption) {
-        List<Product> filteredList = new ArrayList<>(originalProductList);
+        List<Product> filteredList;
 
         // Filter by category
-        if (category != null && !category.equals("All Categories")) {
+        if (category != null && !category.equals("All")) {
+            filteredList = new ArrayList<>(originalProductList);
             filteredList = filteredList.stream().filter(p -> p.getCategory().equals(category)).collect(Collectors.toList());
+        } else {
+            filteredList = new ArrayList<>(originalProductList);
         }
 
         // Sort the filtered list
@@ -90,9 +92,6 @@ public class ProductViewModel extends ViewModel {
                 break;
             case 1: // Price: High to Low
                 Collections.sort(list, (p1, p2) -> Float.compare(p2.getPrice(), p1.getPrice()));
-                break;
-            case 2: // Popularity (Placeholder)
-                // Implement popularity sorting logic here if applicable
                 break;
         }
     }

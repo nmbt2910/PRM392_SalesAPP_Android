@@ -2,6 +2,7 @@ package com.prm392.salesapp.network;
 
 import com.prm392.salesapp.api.AuthApiService;
 import com.prm392.salesapp.api.CartApiService;
+import com.prm392.salesapp.api.ChatApiService;
 import com.prm392.salesapp.api.ProductApiService;
 
 import retrofit2.Retrofit;
@@ -31,5 +32,9 @@ public class RetrofitClient {
 
     public static CartApiService getCartApi() {
         return getClient().create(CartApiService.class);
+    }
+
+    public static ChatApiService getChatApi() {
+        return getClient().create(ChatApiService.class);
     }
 }

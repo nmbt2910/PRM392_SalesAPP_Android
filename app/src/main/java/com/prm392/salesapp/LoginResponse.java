@@ -3,6 +3,7 @@ package com.prm392.salesapp;
 public class LoginResponse {
     private String message;
     private String token;
+    private String role;
 
     public String getToken() {
         return token;
@@ -10,5 +11,9 @@ public class LoginResponse {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

@@ -35,7 +35,8 @@ public class ProductListActivity extends AppCompatActivity {
         reloadButton = findViewById(R.id.reload_button);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ProductListAdapter(new ArrayList<>());
+        // The ProductListAdapter now requires a FilterListener. Since this activity doesn't have search, we pass null.
+        adapter = new ProductListAdapter(new ArrayList<>(), null);
         recyclerView.setAdapter(adapter);
 
         productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
@@ -44,8 +45,8 @@ public class ProductListActivity extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
             errorLayout.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            adapter = new ProductListAdapter(products);
-            recyclerView.setAdapter(adapter);
+            // Update the existing adapter instead of creating a new one.
+            adapter.updateProducts(products);
         });
 
         productViewModel.getProductError().observe(this, error -> {

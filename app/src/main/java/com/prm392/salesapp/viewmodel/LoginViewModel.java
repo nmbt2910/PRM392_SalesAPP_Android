@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.prm392.salesapp.LoginRequest;
 import com.prm392.salesapp.LoginResponse;
+import com.prm392.salesapp.UserProfile;
 import com.prm392.salesapp.api.AuthApiService;
 import com.prm392.salesapp.network.RetrofitClient;
 
@@ -15,7 +16,8 @@ import retrofit2.Response;
 
 public class LoginViewModel extends ViewModel {
     private MutableLiveData<LoginResponse> loginResponse = new MutableLiveData<>();
-    private MutableLiveData<String> loginError = new MutableLiveData<>();
+    private SingleLiveEvent<String> loginError = new SingleLiveEvent<>();
+    private MutableLiveData<UserProfile> userProfile = new MutableLiveData<>();
 
     public LiveData<LoginResponse> getLoginResponse() {
         return loginResponse;
@@ -23,6 +25,10 @@ public class LoginViewModel extends ViewModel {
 
     public LiveData<String> getLoginError() {
         return loginError;
+    }
+
+    public LiveData<UserProfile> getUserProfile() {
+        return userProfile;
     }
 
     public void login(String username, String password) {
@@ -41,6 +47,25 @@ public class LoginViewModel extends ViewModel {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
+                loginError.setValue(t.getMessage());
+            }
+        });
+    }
+
+    public void getProfile(String authToken) {
+        AuthApiService authApi = RetrofitClient.getAuthApi();
+        authApi.getProfile("Bearer " + authToken).enqueue(new Callback<UserProfile>() {
+            @Override
+            public void onResponse(Call<UserProfile> call, Response<UserProfile> response) {
+                if (response.isSuccessful()) {
+                    userProfile.setValue(response.body());
+                } else {
+                    loginError.setValue("Failed to get user profile");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserProfile> call, Throwable t) {
                 loginError.setValue(t.getMessage());
             }
         });

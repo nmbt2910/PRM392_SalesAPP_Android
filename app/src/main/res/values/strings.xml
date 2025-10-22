@@ -3,6 +3,5 @@
     <string-array name="sort_options">
         <item>Sort by Price: Low to High</item>
         <item>Sort by Price: High to Low</item>
-        <item>Sort by Popularity</item>
     </string-array>
 </resources>

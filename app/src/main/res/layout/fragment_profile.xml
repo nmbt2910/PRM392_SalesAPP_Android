@@ -100,19 +100,6 @@
             android:text="Order History" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/shipping_address_button"
-            style="@style/TextAppearance.App.Body1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:drawableStart="@drawable/ic_shipping_outline"
-            android:drawablePadding="16dp"
-            android:gravity="center_vertical"
-            android:padding="16dp"
-            android:text="Shipping Addresses" />
-
-        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/settings_button"
             style="@style/TextAppearance.App.Body1"
             android:layout_width="match_parent"
@@ -125,23 +112,11 @@
             android:padding="16dp"
             android:text="Settings" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/test_notification_button"
-            style="@style/TextAppearance.App.Body1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:drawablePadding="16dp"
-            android:gravity="center_vertical"
-            android:padding="16dp"
-            android:text="Test Notification" />
-
     </LinearLayout>
 
     <Button
         android:id="@+id/logout_button"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

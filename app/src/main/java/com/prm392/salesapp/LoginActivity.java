@@ -55,13 +55,25 @@ public class LoginActivity extends AppCompatActivity {
             editor.putString("AUTH_TOKEN", loginResponse.getToken());
             editor.apply();
 
+            // Fetch the user profile
+            loginViewModel.getProfile(loginResponse.getToken());
+        });
+
+        loginViewModel.getUserProfile().observe(this, userProfile -> {
+            // Save user details
+            SharedPreferences sharedPreferences = getSharedPreferences("SalesAppPrefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("USER_ID", userProfile.getUserId());
+            editor.putBoolean("IS_ADMIN", "admin".equals(userProfile.getRole()));
+            editor.apply();
+
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
             finish();
         });
 
         loginViewModel.getLoginError().observe(this, error -> {
-            Toast.makeText(LoginActivity.this, "Login failed: " + error, Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, error, Toast.LENGTH_SHORT).show();
         });
 
         loginButton.setOnClickListener(v -> loginUser());

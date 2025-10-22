@@ -2,10 +2,12 @@ package com.prm392.salesapp;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,29 +19,37 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.card.MaterialCardView;
 import com.prm392.salesapp.api.CartApiService;
 import com.prm392.salesapp.network.RetrofitClient;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CartFragment extends Fragment implements CartAdapter.CartItemListener {
+public class CartFragment extends Fragment implements CartAdapter.CartItemListener, CartAdapter.FilterListener {
 
     private RecyclerView recyclerView;
     private CartAdapter adapter;
     private ProgressBar progressBar;
     private LinearLayout errorLayout;
+    private LinearLayout emptyCartLayout;
+    private LinearLayout noSearchResultsLayout;
     private Button reloadButton;
     private TextView totalPriceTextView;
+    private MaterialCardView checkoutSummaryCard;
     private Button checkoutButton;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Nullable
     @Override
@@ -49,13 +59,39 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
         recyclerView = view.findViewById(R.id.cart_recycler_view);
         progressBar = view.findViewById(R.id.progress_bar_cart);
         errorLayout = view.findViewById(R.id.error_layout_cart);
+        emptyCartLayout = view.findViewById(R.id.empty_cart_layout);
+        noSearchResultsLayout = view.findViewById(R.id.no_search_results_layout);
         reloadButton = view.findViewById(R.id.reload_button_cart);
         totalPriceTextView = view.findViewById(R.id.total_price_text_view);
+        checkoutSummaryCard = view.findViewById(R.id.checkout_summary_card);
         checkoutButton = view.findViewById(R.id.checkout_button);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout_cart);
+        Toolbar toolbar = view.findViewById(R.id.toolbar_cart);
+
+        // Setup Toolbar
+        toolbar.inflateMenu(R.menu.search_menu);
+        MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         reloadButton.setOnClickListener(v -> fetchCart());
+        swipeRefreshLayout.setOnRefreshListener(this::fetchCart);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(adapter != null){
+                    adapter.getFilter().filter(newText);
+                }
+                return true;
+            }
+        });
 
         checkoutButton.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Checkout not implemented yet.", Toast.LENGTH_SHORT).show();
@@ -73,12 +109,15 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
     private void fetchCart() {
         progressBar.setVisibility(View.VISIBLE);
         errorLayout.setVisibility(View.GONE);
+        emptyCartLayout.setVisibility(View.GONE);
+        noSearchResultsLayout.setVisibility(View.GONE);
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("SalesAppPrefs", Context.MODE_PRIVATE);
         String authToken = sharedPreferences.getString("AUTH_TOKEN", null);
 
         if (authToken == null) {
             progressBar.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
             errorLayout.setVisibility(View.VISIBLE);
             return;
         }
@@ -88,23 +127,35 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
             @Override
             public void onResponse(Call<Cart> call, Response<Cart> response) {
                 progressBar.setVisibility(View.GONE);
-                if (response.isSuccessful() && response.body() != null) {
+                swipeRefreshLayout.setRefreshing(false);
+                if (response.isSuccessful() && response.body() != null && response.body().getItems() != null && !response.body().getItems().isEmpty()) {
                     errorLayout.setVisibility(View.GONE);
+                    emptyCartLayout.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
-                    adapter = new CartAdapter(response.body().getItems(), CartFragment.this);
+                    checkoutSummaryCard.setVisibility(View.VISIBLE);
+                    adapter = new CartAdapter(response.body().getItems(), CartFragment.this, CartFragment.this);
                     recyclerView.setAdapter(adapter);
 
-                    DecimalFormat formatter = new DecimalFormat("$#,##0.##");
-                    totalPriceTextView.setText(formatter.format(response.body().getTotalPrice()));
+                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+                    totalPriceTextView.setText(currencyFormatter.format(response.body().getTotalPrice()));
 
                 } else {
-                    errorLayout.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    checkoutSummaryCard.setVisibility(View.GONE);
+                    if (response.isSuccessful()) {
+                        emptyCartLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        errorLayout.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<Cart> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
+                recyclerView.setVisibility(View.GONE);
+                checkoutSummaryCard.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.VISIBLE);
             }
         });
@@ -189,5 +240,16 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
                 Toast.makeText(getContext(), "Failed to update item", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onFilterComplete(int count) {
+        if (count == 0) {
+            recyclerView.setVisibility(View.GONE);
+            noSearchResultsLayout.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            noSearchResultsLayout.setVisibility(View.GONE);
+        }
     }
 }
