@@ -37,6 +37,7 @@ public class ProfileFragment extends Fragment {
         emailTextView = view.findViewById(R.id.email_textview);
         Button logoutButton = view.findViewById(R.id.logout_button);
         MaterialTextView editProfileButton = view.findViewById(R.id.edit_profile_button);
+    MaterialTextView orderHistoryButton = view.findViewById(R.id.order_history_button);
 
         // Initialize ViewModel
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
@@ -45,6 +46,10 @@ public class ProfileFragment extends Fragment {
         logoutButton.setOnClickListener(v -> logoutUser());
         editProfileButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), EditProfileActivity.class);
+            startActivity(intent);
+        });
+        orderHistoryButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), OrderHistoryActivity.class);
             startActivity(intent);
         });
 
