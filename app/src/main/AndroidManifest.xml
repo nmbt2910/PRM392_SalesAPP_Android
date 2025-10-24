@@ -32,6 +32,10 @@
                 android:value=".HomeActivity" />
         </activity>
 
+        <activity android:name=".CheckoutActivity" />
+    <activity android:name=".OrderHistoryActivity" />
+    <activity android:name=".OrderDetailActivity" />
+
     </application>
 
 </manifest>

@@ -47,6 +47,7 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
     private LinearLayout noSearchResultsLayout;
     private Button reloadButton;
     private TextView totalPriceTextView;
+    private double currentTotal = 0.0;
     private MaterialCardView checkoutSummaryCard;
     private Button checkoutButton;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -94,7 +95,14 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
         });
 
         checkoutButton.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Checkout not implemented yet.", Toast.LENGTH_SHORT).show();
+            // Start CheckoutActivity and pass the numeric total (saved when cart was fetched)
+            try {
+                android.content.Intent intent = new android.content.Intent(getContext(), CheckoutActivity.class);
+                intent.putExtra("ORDER_TOTAL", currentTotal);
+                startActivity(intent);
+            } catch (Exception ex) {
+                Toast.makeText(getContext(), "Unable to start checkout.", Toast.LENGTH_SHORT).show();
+            }
         });
 
         return view;

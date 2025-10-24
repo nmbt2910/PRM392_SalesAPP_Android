@@ -4,4 +4,10 @@
         <item>Sort by Price: Low to High</item>
         <item>Sort by Price: High to Low</item>
     </string-array>
+    <string-array name="payment_methods">
+        <item>Cash on Delivery</item>
+        <item>VNPay</item>
+        <item>ZaloPay</item>
+        <item>PayPal</item>
+    </string-array>
 </resources>
