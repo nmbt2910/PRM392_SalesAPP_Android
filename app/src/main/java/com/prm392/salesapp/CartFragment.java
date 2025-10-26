@@ -144,8 +144,13 @@ public class CartFragment extends Fragment implements CartAdapter.CartItemListen
                     adapter = new CartAdapter(response.body().getItems(), CartFragment.this, CartFragment.this);
                     recyclerView.setAdapter(adapter);
 
+                    // Save the current total for checkout
+                    currentTotal = response.body().getTotalPrice();
+                    
                     NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-                    totalPriceTextView.setText(currencyFormatter.format(response.body().getTotalPrice()));
+                    totalPriceTextView.setText(currencyFormatter.format(currentTotal));
+                    
+                    android.util.Log.d("CartFragment", "Cart Total: " + currentTotal);
 
                 } else {
                     recyclerView.setVisibility(View.GONE);

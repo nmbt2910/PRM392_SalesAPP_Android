@@ -5,10 +5,13 @@ import com.prm392.salesapp.CreateOrderResponse;
 import com.prm392.salesapp.OrderSummary;
 import com.prm392.salesapp.OrderDetail;
 
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 
@@ -22,4 +25,7 @@ public interface OrderApiService {
 
 	@GET("api/orders/getOrdersById/{orderId}")
 	Call<OrderDetail> getOrderDetails(@Header("Authorization") String authToken, @Path("orderId") int orderId);
+	
+	@PUT("api/orders/updatePaymentStatus/{orderId}")
+	Call<Map<String, Object>> updatePaymentStatus(@Header("Authorization") String authToken, @Path("orderId") int orderId, @Body Map<String, String> statusUpdate);
 }

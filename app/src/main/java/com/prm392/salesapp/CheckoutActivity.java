@@ -1,5 +1,8 @@
 package com.prm392.salesapp;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -11,9 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
-import android.content.SharedPreferences;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -34,6 +34,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private Spinner paymentMethodSpinner;
     private TextView orderTotalTextView;
     private Button placeOrderButton;
+    private double orderTotal;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,9 +59,11 @@ public class CheckoutActivity extends AppCompatActivity {
         paymentMethodSpinner.setAdapter(adapter);
 
         // If total passed via intent, show it
-        double total = getIntent().getDoubleExtra("ORDER_TOTAL", 0.0);
-    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN"));
-        orderTotalTextView.setText(currencyFormatter.format(total));
+        orderTotal = getIntent().getDoubleExtra("ORDER_TOTAL", 0.0);
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN"));
+        orderTotalTextView.setText(currencyFormatter.format(orderTotal));
+        
+        android.util.Log.d("CheckoutActivity", "Order Total from intent: " + orderTotal);
 
         placeOrderButton.setOnClickListener(v -> {
             // Basic validation
@@ -72,6 +75,9 @@ public class CheckoutActivity extends AppCompatActivity {
             }
 
             String paymentMethod = paymentMethodSpinner.getSelectedItem().toString();
+            
+            android.util.Log.d("CheckoutActivity", "Payment Method: " + paymentMethod);
+            android.util.Log.d("CheckoutActivity", "Order Total before create: " + orderTotal);
 
             // Build billing address string (simple concatenation)
             String billingAddress = fullNameEditText.getText().toString().trim() + ", " +
@@ -79,36 +85,68 @@ public class CheckoutActivity extends AppCompatActivity {
                     addressEditText.getText().toString().trim() + ", " +
                     cityEditText.getText().toString().trim();
 
-            if (paymentMethod.equalsIgnoreCase("Cash on Delivery")) {
-                // Call backend API to create order
-                SharedPreferences sharedPreferences = getSharedPreferences("SalesAppPrefs", Context.MODE_PRIVATE);
-                String authToken = sharedPreferences.getString("AUTH_TOKEN", null);
-                if (authToken == null) {
-                    Toast.makeText(this, "You must be logged in to place an order.", Toast.LENGTH_SHORT).show();
-                    return;
+            // Create order first
+            createOrder(paymentMethod, billingAddress);
+        });
+    }
+
+    private void createOrder(String paymentMethod, String billingAddress) {
+        SharedPreferences sharedPreferences = getSharedPreferences("SalesAppPrefs", Context.MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("AUTH_TOKEN", null);
+        if (authToken == null) {
+            Toast.makeText(this, "You must be logged in to place an order.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Disable button to prevent double-click
+        placeOrderButton.setEnabled(false);
+        placeOrderButton.setText("Processing...");
+
+        CreateOrderRequest req = new CreateOrderRequest(paymentMethod, billingAddress);
+        OrderApiService orderApi = RetrofitClient.getOrderApi();
+        orderApi.createOrder("Bearer " + authToken, req).enqueue(new Callback<CreateOrderResponse>() {
+            @Override
+            public void onResponse(Call<CreateOrderResponse> call, Response<CreateOrderResponse> response) {
+                placeOrderButton.setEnabled(true);
+                placeOrderButton.setText("Place Order");
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    int orderId = response.body().getOrderId();
+                    
+                    android.util.Log.d("CheckoutActivity", "Order created: " + orderId);
+                    android.util.Log.d("CheckoutActivity", "Sending amount to Payment: " + orderTotal);
+                    
+                    // Handle based on payment method
+                    if (paymentMethod.equalsIgnoreCase("Cash on Delivery")) {
+                        // Direct to confirmation for COD
+                        Intent intent = new Intent(CheckoutActivity.this, OrderConfirmationActivity.class);
+                        intent.putExtra("ORDER_ID", orderId);
+                        startActivity(intent);
+                        finish();
+                    } else if (paymentMethod.equalsIgnoreCase("VNPay") || 
+                               paymentMethod.equalsIgnoreCase("ZaloPay") || 
+                               paymentMethod.equalsIgnoreCase("PayPal")) {
+                        // Redirect to payment gateway
+                        Intent intent = new Intent(CheckoutActivity.this, PaymentActivity.class);
+                        intent.putExtra("ORDER_ID", orderId);
+                        intent.putExtra("PAYMENT_METHOD", paymentMethod);
+                        intent.putExtra("AMOUNT", orderTotal);
+                        intent.putExtra("ORDER_INFO", "Payment for Order #" + orderId);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(CheckoutActivity.this, "Payment method not supported", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(CheckoutActivity.this, "Failed to create order.", Toast.LENGTH_LONG).show();
                 }
+            }
 
-                CreateOrderRequest req = new CreateOrderRequest(paymentMethod, billingAddress);
-                OrderApiService orderApi = RetrofitClient.getOrderApi();
-                orderApi.createOrder("Bearer " + authToken, req).enqueue(new Callback<CreateOrderResponse>() {
-                    @Override
-                    public void onResponse(Call<CreateOrderResponse> call, Response<CreateOrderResponse> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            Toast.makeText(CheckoutActivity.this, "Order created: " + response.body().getOrderId(), Toast.LENGTH_LONG).show();
-                            finish();
-                        } else {
-                            Toast.makeText(CheckoutActivity.this, "Failed to create order.", Toast.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<CreateOrderResponse> call, Throwable t) {
-                        Toast.makeText(CheckoutActivity.this, "Network error while creating order.", Toast.LENGTH_LONG).show();
-                    }
-                });
-            } else {
-                // Other payment methods currently not implemented
-                Toast.makeText(this, "Selected payment method is not implemented yet.", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onFailure(Call<CreateOrderResponse> call, Throwable t) {
+                placeOrderButton.setEnabled(true);
+                placeOrderButton.setText("Place Order");
+                Toast.makeText(CheckoutActivity.this, "Network error while creating order.", Toast.LENGTH_LONG).show();
             }
         });
     }

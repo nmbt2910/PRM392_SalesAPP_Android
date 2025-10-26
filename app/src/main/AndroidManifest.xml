@@ -33,8 +33,20 @@
         </activity>
 
         <activity android:name=".CheckoutActivity" />
-    <activity android:name=".OrderHistoryActivity" />
-    <activity android:name=".OrderDetailActivity" />
+        <activity android:name=".OrderHistoryActivity" />
+        <activity android:name=".OrderDetailActivity" />
+        <activity android:name=".OrderConfirmationActivity" />
+        <activity android:name=".PaymentActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="salesapp"
+                    android:host="payment"
+                    android:pathPrefix="/return" />
+            </intent-filter>
+        </activity>
 
     </application>
 
