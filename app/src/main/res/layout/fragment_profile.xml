@@ -112,6 +112,20 @@
             android:padding="16dp"
             android:text="Settings" />
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/map_screen_button"
+            style="@style/TextAppearance.App.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:drawableStart="@drawable/ic_map"
+            android:drawablePadding="16dp"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:text="Store Locator" />
+
+
     </LinearLayout>
 
     <Button
