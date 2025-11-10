@@ -1,11 +1,13 @@
 package com.prm392.salesapp;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -17,6 +19,8 @@ import androidx.work.WorkManager;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import org.osmdroid.config.Configuration;
+
 public class HomeActivity extends AppCompatActivity {
 
     private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1001;
@@ -24,6 +28,14 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // --- BẮT ĐẦU CẤU HÌNH OSMDROID ---
+        // Load cấu hình osmdroid, rất quan trọng!
+        Context ctx = getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        // Đặt User Agent
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+        // --- KẾT THÚC CẤU HÌNH OSMDROID ---
 
         // Check if the user is logged in
         SharedPreferences sharedPreferences = getSharedPreferences("SalesAppPrefs", MODE_PRIVATE);

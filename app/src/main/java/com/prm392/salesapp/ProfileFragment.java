@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.work.WorkManager;
 
 import com.google.android.material.textview.MaterialTextView;
+import com.prm392.salesapp.storelocations.MapActivity;
 import com.prm392.salesapp.viewmodel.ProfileViewModel;
 
 public class ProfileFragment extends Fragment {
@@ -38,6 +39,7 @@ public class ProfileFragment extends Fragment {
         Button logoutButton = view.findViewById(R.id.logout_button);
         MaterialTextView editProfileButton = view.findViewById(R.id.edit_profile_button);
     MaterialTextView orderHistoryButton = view.findViewById(R.id.order_history_button);
+        MaterialTextView mapScreenButton = view.findViewById(R.id.map_screen_button);
 
         // Initialize ViewModel
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
@@ -50,6 +52,11 @@ public class ProfileFragment extends Fragment {
         });
         orderHistoryButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), OrderHistoryActivity.class);
+            startActivity(intent);
+        });
+
+        mapScreenButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MapActivity.class);
             startActivity(intent);
         });
 
