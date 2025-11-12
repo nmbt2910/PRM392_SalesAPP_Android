@@ -43,7 +43,9 @@
                     android:id="@+id/edit_text_full_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Full name" />
+                    android:hint="Full name"
+                    android:focusable="false"
+                    android:enabled="false" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -57,7 +59,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="phone"
-                    android:hint="Phone number" />
+                    android:hint="Phone number"
+                    android:focusable="false"
+                    android:enabled="false" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
