@@ -7,7 +7,5 @@
     <string-array name="payment_methods">
         <item>Cash on Delivery</item>
         <item>VNPay</item>
-        <item>ZaloPay</item>
-        <item>PayPal</item>
     </string-array>
 </resources>

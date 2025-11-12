@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import com.prm392.salesapp.api.AuthApiService;
 import com.prm392.salesapp.api.OrderApiService;
 import com.prm392.salesapp.network.RetrofitClient;
 
@@ -65,6 +66,9 @@ public class CheckoutActivity extends AppCompatActivity {
         
         android.util.Log.d("CheckoutActivity", "Order Total from intent: " + orderTotal);
 
+        // Load user profile data
+        loadUserProfile();
+
         placeOrderButton.setOnClickListener(v -> {
             // Basic validation
             if (fullNameEditText.getText().toString().trim().isEmpty() ||
@@ -87,6 +91,41 @@ public class CheckoutActivity extends AppCompatActivity {
 
             // Create order first
             createOrder(paymentMethod, billingAddress);
+        });
+    }
+
+    private void loadUserProfile() {
+        SharedPreferences sharedPreferences = getSharedPreferences("SalesAppPrefs", Context.MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("AUTH_TOKEN", null);
+        if (authToken == null) {
+            Toast.makeText(this, "You must be logged in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AuthApiService authApi = RetrofitClient.getAuthApi();
+        authApi.getProfile("Bearer " + authToken).enqueue(new Callback<UserProfile>() {
+            @Override
+            public void onResponse(Call<UserProfile> call, Response<UserProfile> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserProfile profile = response.body();
+                    
+                    // Set full name and phone (disabled fields)
+                    fullNameEditText.setText(profile.getUsername());
+                    phoneEditText.setText(profile.getPhoneNumber());
+                    
+                    // Pre-fill address if available
+                    if (profile.getAddress() != null && !profile.getAddress().isEmpty()) {
+                        addressEditText.setText(profile.getAddress());
+                    }
+                } else {
+                    Toast.makeText(CheckoutActivity.this, "Failed to load profile", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserProfile> call, Throwable t) {
+                Toast.makeText(CheckoutActivity.this, "Network error while loading profile", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -123,9 +162,7 @@ public class CheckoutActivity extends AppCompatActivity {
                         intent.putExtra("ORDER_ID", orderId);
                         startActivity(intent);
                         finish();
-                    } else if (paymentMethod.equalsIgnoreCase("VNPay") || 
-                               paymentMethod.equalsIgnoreCase("ZaloPay") || 
-                               paymentMethod.equalsIgnoreCase("PayPal")) {
+                    } else if (paymentMethod.equalsIgnoreCase("VNPay")) {
                         // Redirect to payment gateway
                         Intent intent = new Intent(CheckoutActivity.this, PaymentActivity.class);
                         intent.putExtra("ORDER_ID", orderId);
