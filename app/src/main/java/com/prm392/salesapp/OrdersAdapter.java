@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import com.prm392.salesapp.DateUtils;
 
 public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.VH> {
     public interface OrderClickListener { void onOrderClicked(int orderId); }
@@ -17,7 +18,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.VH> {
     private OrderClickListener listener;
 
     public OrdersAdapter(List<OrderSummary> items, OrderClickListener listener) {
-        this.items = items;
+        this.items = items != null ? items : java.util.Collections.emptyList();
         this.listener = listener;
     }
 
@@ -31,16 +32,16 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         OrderSummary s = items.get(position);
-    holder.id.setText("Order #" + s.getOrderID());
-    holder.status.setText(s.getOrderStatus());
-    holder.date.setText(s.getOrderDate());
+        holder.id.setText("Order " + s.getOrderID());
+        holder.status.setText(s.getOrderStatus());
+        holder.date.setText(DateUtils.formatIsoToLocal(s.getOrderDate()));
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onOrderClicked(s.getOrderID());
         });
     }
 
     @Override
-    public int getItemCount() { return items.size(); }
+    public int getItemCount() { return items == null ? 0 : items.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
         TextView id, status, date;

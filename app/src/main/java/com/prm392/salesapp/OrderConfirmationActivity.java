@@ -123,7 +123,7 @@ public class OrderConfirmationActivity extends AppCompatActivity {
 
     private void displayOrderConfirmation(OrderDetail orderDetail) {
         // Display order information
-        orderIdTextView.setText("Order #" + orderDetail.getOrderID());
+        orderIdTextView.setText("Order " + orderDetail.getOrderID());
         orderStatusTextView.setText(orderDetail.getOrderStatus());
         paymentMethodTextView.setText(orderDetail.getPaymentMethod());
         billingAddressTextView.setText(orderDetail.getBillingAddress());

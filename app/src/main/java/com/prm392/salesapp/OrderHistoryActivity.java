@@ -54,8 +54,13 @@ public class OrderHistoryActivity extends AppCompatActivity implements OrdersAda
             @Override
             public void onResponse(Call<List<OrderSummary>> call, Response<List<OrderSummary>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    adapter = new OrdersAdapter(response.body(), OrderHistoryActivity.this);
-                    recyclerView.setAdapter(adapter);
+                    try {
+                        adapter = new OrdersAdapter(response.body(), OrderHistoryActivity.this);
+                        recyclerView.setAdapter(adapter);
+                    } catch (Exception ex) {
+                        Log.e("OrderHistoryActivity", "Failed to set adapter", ex);
+                        Toast.makeText(OrderHistoryActivity.this, "Error displaying orders: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     int code = response.code();
                     String errBody = "";

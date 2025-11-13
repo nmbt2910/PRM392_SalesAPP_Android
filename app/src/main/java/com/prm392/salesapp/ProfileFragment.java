@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.work.WorkManager;
 
 import com.google.android.material.textview.MaterialTextView;
+import android.util.Log;
 import com.prm392.salesapp.storelocations.MapActivity;
 import com.prm392.salesapp.viewmodel.ProfileViewModel;
 
@@ -51,8 +52,13 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
         orderHistoryButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), OrderHistoryActivity.class);
-            startActivity(intent);
+            try {
+                Intent intent = new Intent(getActivity(), OrderHistoryActivity.class);
+                startActivity(intent);
+            } catch (Exception ex) {
+                Log.e("ProfileFragment", "Failed to open OrderHistory", ex);
+                Toast.makeText(getContext(), "Cannot open Order History: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+            }
         });
 
         mapScreenButton.setOnClickListener(v -> {

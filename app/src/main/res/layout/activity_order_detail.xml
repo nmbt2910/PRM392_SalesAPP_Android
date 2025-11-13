@@ -25,55 +25,97 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="6dp"
+            app:cardUseCompatPadding="true">
 
-            <TextView
-                android:id="@+id/text_detail_order_id"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Order #" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                android:id="@+id/text_detail_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Status: " />
+                <TextView
+                    android:id="@+id/text_detail_order_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Order"
+                    android:textStyle="bold"
+                    android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/text_detail_payment_method"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Payment: " />
+                <TextView
+                    android:id="@+id/text_detail_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status: "
+                    android:layout_marginTop="8dp" />
 
-            <TextView
-                android:id="@+id/text_detail_billing"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Address: " />
+                <TextView
+                    android:id="@+id/text_detail_payment_method"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Payment: "
+                    android:layout_marginTop="6dp" />
 
-            <TextView
-                android:id="@+id/text_detail_amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Amount: " />
+                <!-- Billing details split clearly -->
+                <TextView
+                    android:id="@+id/label_billing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Billing"
+                    android:textStyle="bold"
+                    android:layout_marginTop="12dp" />
 
-            <TextView
-                android:id="@+id/text_detail_payment_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Payment status: " />
+                <TextView
+                    android:id="@+id/text_billing_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name: "
+                    android:layout_marginTop="4dp" />
 
-            <TextView
-                android:id="@+id/text_detail_order_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Order date: " />
+                <TextView
+                    android:id="@+id/text_billing_phone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phone: "
+                    android:layout_marginTop="2dp" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/text_billing_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Address: "
+                    android:layout_marginTop="2dp" />
+
+                <TextView
+                    android:id="@+id/text_detail_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Amount: "
+                    android:layout_marginTop="12dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/text_detail_payment_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Payment status: "
+                    android:layout_marginTop="6dp" />
+
+                <TextView
+                    android:id="@+id/text_detail_order_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Order date: " />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </ScrollView>
 
